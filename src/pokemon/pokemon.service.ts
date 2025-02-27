@@ -21,14 +21,7 @@ export class PokemonService {
     try {
       return await this.pokemonModel.create(createPokemonDto);
     } catch (err: any) {
-      if (err.code === 11000) {
-        throw new BadRequestException(
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          `Pokemon ${JSON.stringify(err.keyValue)} already exists`,
-        );
-      } else {
-        throw new InternalServerErrorException('Cannot create pokemon');
-      }
+      this._handleExecptions(err);
     }
   }
 
@@ -60,8 +53,29 @@ export class PokemonService {
     return pokemon;
   }
 
-  update(id: number, updatePokemonDto: UpdatePokemonDto) {
-    return `This action updates a #${id} pokemon`;
+  async update(term: string, updatePokemonDto: UpdatePokemonDto) {
+    const pokemon = await this.findOne(term);
+    if (updatePokemonDto.name)
+      updatePokemonDto.name = updatePokemonDto.name.toLocaleLowerCase();
+
+    try {
+      await pokemon.updateOne(updatePokemonDto, { new: true });
+      return { ...pokemon.toJSON(), ...updatePokemonDto };
+    } catch (error) {
+      this._handleExecptions(error);
+    }
+  }
+
+  private _handleExecptions(error: any) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    if (error.code === 11000) {
+      throw new BadRequestException(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        `Pokemon ${JSON.stringify(error.keyValue)} already exists whit this date`,
+      );
+    } else {
+      throw new InternalServerErrorException('Cannot create pokemon');
+    }
   }
 
   remove(id: number) {
