@@ -2,10 +2,11 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreatePokemonDto } from './dto/create-pokemon.dto';
 import { UpdatePokemonDto } from './dto/update-pokemon.dto';
-import { Model } from 'mongoose';
+import { isValidObjectId, Model } from 'mongoose';
 import { Pokemon } from './entities/pokemon.entity';
 import { InjectModel } from '@nestjs/mongoose';
 
@@ -35,8 +36,28 @@ export class PokemonService {
     return `This action returns all pokemon`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} pokemon`;
+  async findOne(termino: string) {
+    let pokemon: Pokemon | null = null;
+
+    if (!isNaN(+termino)) {
+      pokemon = (await this.pokemonModel.findOne({
+        no: +termino,
+      })) as Pokemon;
+    }
+
+    if (!pokemon && isValidObjectId(termino)) {
+      pokemon = await this.pokemonModel.findById(termino);
+    }
+
+    if (!pokemon) {
+      pokemon = await this.pokemonModel.findOne({
+        name: termino.toLocaleLowerCase(),
+      });
+    }
+
+    if (!pokemon) throw new NotFoundException('Pokemon no exists');
+
+    return pokemon;
   }
 
   update(id: number, updatePokemonDto: UpdatePokemonDto) {
