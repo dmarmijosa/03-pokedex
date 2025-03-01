@@ -14,6 +14,10 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
       //transforma los tipos de datos a los que se especifico en el dto
       transform: true,
+      //transforma los tipos de datos a los que se especifica
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
     }),
   );
   await app.listen(process.env.PORT ?? 3000);
