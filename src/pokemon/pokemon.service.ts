@@ -96,4 +96,12 @@ export class PokemonService {
 
     //return await this.pokemonModel.findByIdAndDelete(id);
   }
+
+  async removeAll() {
+    return await this.pokemonModel.deleteMany({});
+  }
+
+  async insertMany(pokemon: { name: string; no: number }[]) {
+    return await this.pokemonModel.insertMany(pokemon);
+  }
 }
