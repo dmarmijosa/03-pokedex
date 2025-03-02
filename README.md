@@ -33,3 +33,6 @@ npm run start:dev
 ```bash
 GET http://localhost:3000/api/v1/seed
 ```
+
+
+''__URL PPRODUCCIÓN__'': ```pokedex-production-dmarmijosa.up.railway.app```
